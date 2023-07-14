@@ -32,12 +32,8 @@ const getAllProducts = async (req, res) => {
             options.limit = _limit
         }
         const populated = _expand !== undefined ? [{
-            path: 'categories'
-        }, {
-            path: 'comments'
-        }] : [{
-            path: 'comments'
-        }]
+            path: 'categoryId'
+        }] : []
         const products = await Product.paginate({}, { ...options, populate: populated });
 
         if (products.docs.length === 0) {
