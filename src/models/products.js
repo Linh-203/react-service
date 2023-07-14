@@ -19,6 +19,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    favorite: {
+        type: Number,
+        required: true
+    },
     images: [
         {
             url: {

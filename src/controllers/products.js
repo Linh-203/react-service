@@ -8,6 +8,7 @@ const productSchema = Joi.object({
     stock: Joi.number().required().min(0),
     solded: Joi.number().required().min(0),
     discount: Joi.number().required().min(0),
+    favorite: Joi.number().required().min(0),
     images: Joi.array().items(Joi.object({
       url: Joi.string().required(),
       public_id: Joi.string().required(),
