@@ -23,6 +23,6 @@ app.use('/api', orderRouter);
 app.use('/api', uploadRouter);
 mongoose
    .connect(process.env.MONGO_URL)
+   .then(() => console.log('ok'))
    .catch((err) => console.log(err));
 export const viteNodeApp = app;
-
