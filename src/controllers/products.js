@@ -14,7 +14,7 @@ const productSchema = Joi.object({
          Joi.object({
             url: Joi.string().required(),
             public_id: Joi.string().required()
-         })
+         }).required()
       )
       .required(),
    desc: Joi.string().min(32),
