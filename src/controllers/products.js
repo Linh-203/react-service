@@ -14,17 +14,26 @@ const productSchema = Joi.object({
          Joi.object({
             url: Joi.string().required(),
             public_id: Joi.string().required()
-         }).required()
-      )
-      .required(),
+         }).required(),
    desc: Joi.string().min(32),
    categoryId: Joi.string().required()
 });
 
 const getAllProducts = async (req, res) => {
    try {
-      const { _sort = 'createAt', _order = 'asc', _limit = 1000, _page = 1, _expand, _q = '' } = req.query;
-
+      const {
+         _sort = 'createAt',
+         _order = 'asc',
+         _limit,
+         _page = 1,
+         _expand,
+         _q = '',
+         _from = 1,
+         _to = 10000000,
+         _cate = '',
+         _inStock = false,
+         _outStock = false
+      } = req.query;
       const options = {
          page: _page,
          sort: {
@@ -35,6 +44,16 @@ const getAllProducts = async (req, res) => {
       if (_limit !== undefined) {
          options.limit = _limit;
       }
+      const filters = {};
+      if (_cate) {
+         filters.categoryId = _cate;
+      }
+      if (_inStock) {
+         filters.stock = { $gt: 0 };
+      }
+      if (_outStock) {
+         filters.stock = 0;
+      }
       const populated =
          _expand !== undefined
             ? [
@@ -43,8 +62,14 @@ const getAllProducts = async (req, res) => {
                  }
               ]
             : [];
-      const products = await Product.paginate({}, { ...options, populate: populated });
-
+      const products = await Product.paginate(
+         { price: { $gte: _from, $lte: _to }, ...filters },
+         { ...options, populate: populated }
+      );
+      //dont know how can optimize performance under
+      const maxPrice = await Product.find().sort({ price: -1 }).limit(1);
+      const inStocks = await Product.find({ stock: { $gt: 0 } });
+      //
       if (products.docs.length === 0) {
          res.json({
             message: 'No products found'
@@ -57,8 +82,10 @@ const getAllProducts = async (req, res) => {
                currentPage: products.page,
                totalPages: products.totalPages,
                totalItems: products.totalDocs
-            }
-         });
+            },
+            maxPrice: maxPrice[0].price,
+            inStock: inStocks.length
+            });
       }
    } catch (err) {
       res.status(500).send({ message: err.message });
@@ -161,7 +188,6 @@ const patchProducts = async (req, res) => {
          });
       }
       const product = await Product.findOne({ _id: req.params.id });
-
       if (!product) {
          return res.status(400).send({
             message: 'Không lấy được sản phẩm'
