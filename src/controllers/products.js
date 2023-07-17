@@ -24,7 +24,7 @@ const productSchema = Joi.object({
 const getAllProducts = async (req, res) => {
    try {
       const { _sort = 'createAt', _order = 'asc', _limit = 1000, _page = 1, _expand, _q = '' } = req.query;
-      console.log(_q);
+
       const options = {
          page: _page,
          sort: {
@@ -161,6 +161,7 @@ const patchProducts = async (req, res) => {
          });
       }
       const product = await Product.findOne({ _id: req.params.id });
+
       if (!product) {
          return res.status(400).send({
             message: 'Không lấy được sản phẩm'
@@ -209,7 +210,6 @@ const createProducts = async (req, res) => {
             errors: errs
          });
       }
-      console.log(req.body);
       const product = await Product.create(req.body);
       if (!product) {
          return res.status(400).send({
