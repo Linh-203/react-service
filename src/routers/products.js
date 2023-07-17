@@ -7,7 +7,7 @@ const router = express.Router()
 router.get('/products', product.getAllProducts)
 router.get('/products/:id', product.getDetailProducts)
 router.delete('/products/:id', product.removeProducts)
-router.put('/products/:id', product.patchProducts)
+router.patch('/products/:id', product.patchProducts)
 router.post('/products', product.createProducts)
 //router.post('/products/restore/:id', checkPermission, product.restorePrd)
 
