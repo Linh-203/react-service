@@ -32,8 +32,11 @@ const getAllProducts = async (req, res) => {
          _q = '',
          _from = 1,
          _to = 10000000,
-         
+         _cate = '',
+         _inStock = false,
+         _outStock = false
       } = req.query;
+
       const options = {
          page: _page,
          sort: {
@@ -44,6 +47,16 @@ const getAllProducts = async (req, res) => {
       if (_limit !== undefined) {
          options.limit = _limit;
       }
+      const filters = {};
+      if (_cate) {
+         filters.categoryId = _cate;
+      }
+      if (_inStock) {
+         filters.stock = { $gt: 0 };
+      }
+      if (_outStock) {
+         filters.stock = 0;
+      }
       const populated =
          _expand !== undefined
             ? [
@@ -53,11 +66,13 @@ const getAllProducts = async (req, res) => {
               ]
             : [];
       const products = await Product.paginate(
-         { price: { $gte: _from, $lte: _to } },
+         { price: { $gte: _from, $lte: _to }, ...filters },
          { ...options, populate: populated }
       );
+      //dont know how can optimize performance under
       const maxPrice = await Product.find().sort({ price: -1 }).limit(1);
       const inStocks = await Product.find({ stock: { $gt: 0 } });
+      //
       if (products.docs.length === 0) {
          res.json({
             message: 'No products found'
