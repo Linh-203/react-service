@@ -2,12 +2,12 @@ import { defineConfig } from 'vite';
 import { VitePluginNode } from 'vite-plugin-node';
 import dotenv from 'dotenv';
 
-dotenv.config();
+
 export default defineConfig({
    // ...vite configures
    server: {
       // vite server configs, for details see [vite doc](https://vitejs.dev/config/#server-host)
-      port: +process.env.PORT
+      port: 8000
    },
    plugins: [
       ...VitePluginNode({
