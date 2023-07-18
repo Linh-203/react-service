@@ -9,7 +9,7 @@ const storage = new CloudinaryStorage({
    cloudinary: cloudinary,
    params: {
       folder: 'nhom3',
-      format: 'jpg'
+      format: []
    }
 });
 const upload = multer({

@@ -55,27 +55,27 @@ const getDetailCategory = async (req, res) => {
 const removeCategories = async (req, res) => {
    try {
       const category = await Category.findOne({ _id: req.params.id });
+      const defaultCategoryId = "64b646e60c3ef0986d3b1b33"; //id Danh mục mặc định
 
-      const products = await Product.find({});
-      for (const product of products) {
-         if (product.categories.includes(category._id)) {
-            console.log(category._id);
-            await Product.findByIdAndUpdate(product._id, {
-               $pull: {
-                  categories: category._id
-               }
-            });
-         }
-      }
+      await Product.updateMany(
+         { category: category._id },
+         { $set: { category: defaultCategoryId } }
+      );
+
+      const defaultCate = await Category.findByIdAndUpdate(defaultCategoryId, {
+         $push: { products: category.products }
+      },{new:true});
+
       await Category.findOneAndDelete({ _id: req.params.id });
       res.json({
          message: 'Delete category successfully',
-         data: category
+         data: defaultCate
       });
    } catch (err) {
       res.status(500).send({ message: err.message });
    }
 };
+
 
 const patchCategories = async (req, res) => {
    try {
