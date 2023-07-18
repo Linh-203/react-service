@@ -4,6 +4,7 @@ import Product from '../models/products';
 
 const categorySchema = Joi.object({
    name: Joi.string().required().min(3),
+   image: Joi.string().required(),
    products: Joi.array().items(Joi.string())
 });
 
@@ -26,50 +27,27 @@ const getAllCategories = async (req, res) => {
 };
 
 const getDetailCategory = async (req, res) => {
-   const categoryId = req.params.id;
-   const { _page = 1, _limit = 10, _sort = 'createdAt', _order = 'asc', _embed } = req.query;
-   const options = {
-      page: _page,
-      limit: _limit,
-      sort: { [_sort]: _order === 'desc' ? -1 : 1 }
-   };
-   const populateOptions = _embed !== undefined ? [{ path: 'products' }] : [];
+  
    try {
-      const category = await Category.find({ _id: categoryId });
+      const category = await Category.findOne({ _id: req.params.id });
       if (category.length === 0) {
          return res.json({
             message: 'No category found'
          });
       }
-      const results = await Category.paginate({ _id: categoryId }, { ...options, populate: populateOptions });
-      console.log(results.docs);
-      if (results.docs.length === 0) {
+     
+      if (!category) {
          return res.status(404).json({
             message: 'No products found in this category'
          });
       }
-      if (_embed !== undefined) {
-         return res.json({
-            data: {
-               category,
-               products: results.docs[0].products
-            },
-            pagination: {
-               currentPage: results.page,
-               totalPages: results.totalPages,
-               totalItems: results.totalDocs
-            }
-         });
-      } else {
+    
          return res.status(200).json({
-            data: results.docs,
-            pagination: {
-               currentPage: results.page,
-               totalPages: results.totalPages,
-               totalItems: results.totalDocs
-            }
-         });
-      }
+         message :"Get categories successfully",
+         category
+            
+         })
+      
    } catch (err) {
       res.status(500).send({ message: err.message });
    }
