@@ -9,14 +9,12 @@ const productSchema = Joi.object({
    solded: Joi.number().required().min(0),
    discount: Joi.number().required().min(0),
    favorite: Joi.number().required().min(0),
-   images: Joi.array()
-      .items(
-         Joi.object({
-            url: Joi.string().required(),
-            public_id: Joi.string().required()
-         })
-      )
-      .required(),
+   images: Joi.array().items(
+      Joi.object({
+         url: Joi.string().required(),
+         public_id: Joi.string().required()
+      }).required()
+   ),
    desc: Joi.string().min(32),
    categoryId: Joi.string().required()
 });
@@ -36,7 +34,6 @@ const getAllProducts = async (req, res) => {
          _inStock,
          _outStock
       } = req.query;
-
       const options = {
          page: _page,
          sort: {
@@ -245,7 +242,6 @@ const createProducts = async (req, res) => {
             errors: errs
          });
       }
-      console.log(req.body);
       const product = await Product.create(req.body);
       if (!product) {
          return res.status(400).send({
