@@ -39,7 +39,7 @@ const getAllProducts = async (req, res) => {
          sort: {
             [_sort]: _order === 'desc' ? -1 : 1
          },
-         filter: { name: { $regex: _q, $options: 'i' } }
+         collation: { locale: 'vi', strength: 1 }
       };
       if (_limit !== undefined) {
          options.limit = _limit;
@@ -54,6 +54,7 @@ const getAllProducts = async (req, res) => {
       if (_outStock == 'true') {
          filters.stock = 0;
       }
+      const optionsSearch = _q !== '' ? { $text: { $search: _q } } : {};
       const populated =
          _expand !== undefined
             ? [
@@ -63,7 +64,7 @@ const getAllProducts = async (req, res) => {
               ]
             : [];
       const products = await Product.paginate(
-         { price: { $gte: _from, $lte: _to }, ...filters },
+         { price: { $gte: _from, $lte: _to },...optionsSearch, ...filters },
          { ...options, populate: populated }
       );
       //dont know how can optimize performance under
