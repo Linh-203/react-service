@@ -41,7 +41,6 @@ const getDetailCategory = async (req, res) => {
             message: 'No products found in this category'
          });
       }
-    
          return res.status(200).json({
          message :"Get categories successfully",
          category
