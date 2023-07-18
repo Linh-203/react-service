@@ -9,12 +9,12 @@ const productSchema = Joi.object({
    solded: Joi.number().required().min(0),
    discount: Joi.number().required().min(0),
    favorite: Joi.number().required().min(0),
-   images: Joi.array()
-      .items(
-         Joi.object({
-            url: Joi.string().required(),
-            public_id: Joi.string().required()
-         }).required(),
+   images: Joi.array().items(
+      Joi.object({
+         url: Joi.string().required(),
+         public_id: Joi.string().required()
+      }).required()
+   ),
    desc: Joi.string().min(32),
    categoryId: Joi.string().required()
 });
@@ -31,8 +31,8 @@ const getAllProducts = async (req, res) => {
          _from = 1,
          _to = 10000000,
          _cate = '',
-         _inStock = false,
-         _outStock = false
+         _inStock,
+         _outStock
       } = req.query;
       const options = {
          page: _page,
@@ -48,10 +48,10 @@ const getAllProducts = async (req, res) => {
       if (_cate) {
          filters.categoryId = _cate;
       }
-      if (_inStock) {
+      if (_inStock == 'true') {
          filters.stock = { $gt: 0 };
       }
-      if (_outStock) {
+      if (_outStock == 'true') {
          filters.stock = 0;
       }
       const populated =
@@ -67,12 +67,18 @@ const getAllProducts = async (req, res) => {
          { ...options, populate: populated }
       );
       //dont know how can optimize performance under
+      let inStocks = [];
       const maxPrice = await Product.find().sort({ price: -1 }).limit(1);
-      const inStocks = await Product.find({ stock: { $gt: 0 } });
+      if (_inStock !== 'true' && _outStock !== 'true') {
+         inStocks = await Product.find({ stock: { $gt: 0 } });
+      } else if (_inStock === 'true') {
+         inStocks = products.docs.filter((product) => product.stock > 0);
+      }
       //
       if (products.docs.length === 0) {
          res.json({
-            message: 'No products found'
+            message: 'No products found',
+            data: []
          });
       } else {
          res.json({
@@ -84,8 +90,8 @@ const getAllProducts = async (req, res) => {
                totalItems: products.totalDocs
             },
             maxPrice: maxPrice[0].price,
-            inStock: inStocks.length
-            });
+            inStock: _outStock === 'true' ? 0 : inStocks.length
+         });
       }
    } catch (err) {
       res.status(500).send({ message: err.message });
