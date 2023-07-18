@@ -15,7 +15,7 @@ const productSchema = Joi.object({
          public_id: Joi.string().required()
       }).required()
    ),
-   desc: Joi.string().min(32),
+   desc: Joi.string().required(),
    categoryId: Joi.string().required()
 });
 
@@ -100,7 +100,9 @@ const getAllProducts = async (req, res) => {
 
 const getDetailProducts = async (req, res) => {
    try {
-      const product = await Product.find({ _id: req.params.id }).populate(['categoryId']);
+      const product = await Product.findOne({ _id: req.params.id }).populate([
+         { path: 'categoryId', select: ['_id', 'name', 'image'] }
+      ]);
       if (product.length === 0) {
          res.json({
             message: 'No product found'
