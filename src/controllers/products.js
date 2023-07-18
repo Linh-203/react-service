@@ -100,7 +100,7 @@ const getAllProducts = async (req, res) => {
 
 const getDetailProducts = async (req, res) => {
    try {
-      const product = await Product.find({ _id: req.params.id }).populate(['categoryId']);
+      const product = await Product.findOne({ _id: req.params.id }).populate(['categoryId']);
       if (product.length === 0) {
          res.json({
             message: 'No product found'
