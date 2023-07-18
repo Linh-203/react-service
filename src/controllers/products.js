@@ -24,7 +24,7 @@ const getAllProducts = async (req, res) => {
       const {
          _sort = 'createAt',
          _order = 'asc',
-         _limit,
+         _limit = 100000,
          _page = 1,
          _expand,
          _q = '',
