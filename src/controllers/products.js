@@ -1,23 +1,6 @@
 import Category from '../models/categories';
 import Product from '../models/products';
-import Joi from 'joi';
-
-const productSchema = Joi.object({
-   name: Joi.string().required().min(3),
-   price: Joi.number().required().min(0),
-   stock: Joi.number().required().min(0),
-   solded: Joi.number().required().min(0),
-   discount: Joi.number().required().min(0),
-   favorite: Joi.number().required().min(0),
-   images: Joi.array().items(
-      Joi.object({
-         url: Joi.string().required(),
-         public_id: Joi.string().required()
-      }).required()
-   ),
-   desc: Joi.string().required(),
-   categoryId: Joi.string().required()
-});
+import { productSchema } from '../validation/products';
 
 const getAllProducts = async (req, res) => {
    try {
@@ -64,7 +47,7 @@ const getAllProducts = async (req, res) => {
               ]
             : [];
       const products = await Product.paginate(
-         { price: { $gte: _from, $lte: _to },...optionsSearch, ...filters },
+         { price: { $gte: _from, $lte: _to }, ...optionsSearch, ...filters },
          { ...options, populate: populated }
       );
       //dont know how can optimize performance under
@@ -102,7 +85,8 @@ const getAllProducts = async (req, res) => {
 const getDetailProducts = async (req, res) => {
    try {
       const product = await Product.findOne({ _id: req.params.id }).populate([
-         { path: 'categoryId', select: ['_id', 'name', 'image'] }
+         { path: 'categoryId', select: ['_id', 'name', 'image'] },
+         { path: 'variations.vendorId', select: ['name'] }
       ]);
       if (product.length === 0) {
          res.json({
@@ -130,7 +114,7 @@ const removeProducts = async (req, res) => {
             }
          });
       } else {
-         res.status(500).send({ message: err.message });
+         res.status(500).send({ message: 'Delete failed' });
       }
 
       await Product.findOneAndDelete({ _id: req.params.id });
@@ -139,8 +123,8 @@ const removeProducts = async (req, res) => {
          message: 'Delete product successfully',
          data: product
       });
-   } catch (err) {
-      res.status(500).send({ message: err.message });
+   } catch (error) {
+      res.status(500).send({ message: error.message });
    }
 };
 
@@ -202,17 +186,13 @@ const patchProducts = async (req, res) => {
             message: 'Không lấy được sản phẩm'
          });
       }
-
       //remove id product from Category if product delete categoryId
-
       await Category.findOneAndUpdate(product.categoryId, {
          $pull: {
             products: product._id
          }
       });
-
       //add id product from Category if product add categoryId
-
       await Category.findOneAndUpdate(
          { _id: product.categoryId },
          {
@@ -221,11 +201,10 @@ const patchProducts = async (req, res) => {
             }
          }
       );
-
-      await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      const newProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
       res.json({
          message: 'Update product successfully',
-         data: product
+         data: newProduct
       });
    } catch (err) {
       res.status(500).send({ message: err.message });
@@ -245,24 +224,20 @@ const createProducts = async (req, res) => {
             errors: errs
          });
       }
-      const product = await Product.create(req.body);
+      const product = await Product.create({
+         ...req.body,
+         stock: req.body.variations.reduce((quantity, item) => (quantity += item.quantity), 0)
+      });
       if (!product) {
          return res.status(400).send({
-            message: 'Không thêm sản phẩm'
+            message: 'Error when add product'
          });
       }
-      try {
-         await Category.findByIdAndUpdate(product.categoryId, {
-            $addToSet: {
-               products: product._id
-            }
-         });
-      } catch (error) {
-         return res.status(400).send({
-            message: 'Lỗi khi thêm sản phẩm'
-         });
-      }
-
+      await Category.findByIdAndUpdate(product.categoryId, {
+         $addToSet: {
+            products: product._id
+         }
+      });
       res.json({
          message: 'Create product successfully',
          data: product
