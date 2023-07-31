@@ -9,6 +9,7 @@ import uploadRouter from './routers/upload';
 
 import cors from 'cors';
 import dotenv from 'dotenv';
+import vendorRoute from './routers/vendor';
 
 const app = express();
 dotenv.config();
@@ -21,6 +22,7 @@ app.use('/api', authRouter);
 app.use('/api', cartRouter);
 app.use('/api', orderRouter);
 app.use('/api', uploadRouter);
+app.use('/api', vendorRoute);
 mongoose
    .connect(process.env.MONGO_URL)
    .then(() => console.log('connect success'))
