@@ -150,7 +150,7 @@ export const getCartUser = async (req, res) => {
 
         //tìm trong giỏ hàng theo idUser
         let cart = await Cart.findOne({ userId: req.params.id })
-
+      
         if (!cart) {
             return res.status(401).json({
                 message: "Cart not found",
