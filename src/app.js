@@ -6,6 +6,7 @@ import authRouter from './routers/auth';
 import cartRouter from './routers/carts';
 import orderRouter from './routers/orders';
 import uploadRouter from './routers/upload';
+import userRouter from './routers/auth';
 
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -21,6 +22,7 @@ app.use('/api', authRouter);
 app.use('/api', cartRouter);
 app.use('/api', orderRouter);
 app.use('/api', uploadRouter);
+app.use('/api', userRouter);
 mongoose
    .connect(process.env.MONGO_URL)
    .then(() => console.log('connect success'))
