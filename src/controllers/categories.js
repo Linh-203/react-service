@@ -103,7 +103,6 @@ const patchCategories = async (req, res) => {
 
 const createCategory = async (req, res) => {
    try {
-      console.log(req.user);
       const { error } = categorySchema.validate(req.body, { abortEarly: false });
       if (error) {
          const errs = [];
