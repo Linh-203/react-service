@@ -1,26 +1,37 @@
-import User from "../models/users"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
+import User from '../models/users';
+import jwt from 'jsonwebtoken';
 
-export const register = async (req, res) => {
-    try {
-        const { email, password } = req.body
-        const emailExists = await User.findOne({ email: email })
-        if (emailExists) {
-            return res.status(401).json({
-                message: "Email đã được đăng ký"
-            })
-        }
-        const hashPassword = await bcrypt.hash(password, 10)
-        const user = await User.create({ ...req.body, password: hashPassword })
+const createToken = (_id) => {
+   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '1d' });
+};
+//signup
+const signupUser = async (req, res) => {
+   const { name, email, password, phone } = req.body;
+   try {
+      const user = await User.signup(name, email, password, phone);
+      // create token
+      const token = createToken(user._id);
+      res.status(200).json({ email, token });
+   } catch (error) {
+      res.status(400).json({ error: error.message });
+   }
+};
 
-        return res.status(201).json({
-            message: "Register account successfully",
-            user
-        })
-    } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        })
-    }
-}
+//login
+const loginUser = async (req, res) => {
+   const { email, password } = req.body;
+   try {
+      const user = await User.login(email, password);
+      // create token
+      const token = createToken(user._id);
+      res.status(200).json({ email, token });
+   } catch (error) {
+      res.status(400).json({ error: error.message });
+   }
+};
+
+export const users = {
+   signupUser,
+   loginUser,
+  
+};
