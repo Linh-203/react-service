@@ -41,18 +41,22 @@ const productSchema = new mongoose.Schema(
       },
       variations: [
          {
-            weight:{
-               type:Number,
-               required:true
+            _id: {
+               type: String,
+               required: true
             },
-            vendorId:{
-               type:mongoose.Schema.Types.ObjectId,
-               ref:'vendor',
-               required:true
+            weight: {
+               type: Number,
+               required: true
             },
-            quantity:{
-               type:Number,
-               required:true
+            vendorId: {
+               type: mongoose.Schema.Types.ObjectId,
+               ref: 'vendor',
+               required: true
+            },
+            quantity: {
+               type: Number,
+               required: true
             }
          }
       ]

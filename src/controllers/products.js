@@ -1,5 +1,6 @@
 import Category from '../models/categories';
 import Product from '../models/products';
+import vendorModel from '../models/vendor';
 import { productSchema } from '../validation/products';
 
 const getAllProducts = async (req, res) => {

@@ -15,6 +15,7 @@ export const productSchema = Joi.object({
    variations: Joi.array()
       .items(
          Joi.object({
+            _id: Joi.string().required(),
             weight: Joi.number().required(),
             vendorId: Joi.string().required(),
             quantity: Joi.number().required()
