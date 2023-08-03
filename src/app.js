@@ -27,7 +27,7 @@ app.use('/api', uploadRouter);
 app.use('/api', userRouter);
 app.use('/api', vendorRoute);
 mongoose
-   .connect(process.env.MONGO_URL)
+   .connect("mongodb://127.0.0.1:27017/vegetables")
    .then(() => console.log('connect success'))
    .catch((err) => console.log(err));
 export const viteNodeApp = app;

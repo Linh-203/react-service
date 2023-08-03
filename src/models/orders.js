@@ -31,10 +31,16 @@ const orderSchema = new mongoose.Schema(
             price: {
                type: Number,
                required: true
-            }
+            },
+            
+             
+            
          }
       ],
-
+      receivedDate:{
+         type:String,
+         default:""
+      },
       pay: {
          type: Boolean,
          default: false
