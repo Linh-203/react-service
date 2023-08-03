@@ -103,13 +103,6 @@ export const removeOneProductInCart = async (req, res) => {
         cart.products.splice(productIndex, 1)
 
         cart.totalPrice = cart.totalPrice - (product.price * productExits.quantity)
-        if (cart.totalPrice == 0) {
-            await cart.deleteOne({ id: cart._id })
-            return res.status(203).json({
-                message: "Remove product in cart successfully => EmptyCart",
-
-            })
-        }
         cart.save()
         await cart.populate("products.productId")
 
@@ -150,7 +143,7 @@ export const getCartUser = async (req, res) => {
 
         //tìm trong giỏ hàng theo idUser
         let cart = await Cart.findOne({ userId: req.params.id })
-      
+
         if (!cart) {
             return res.status(401).json({
                 message: "Cart not found",
