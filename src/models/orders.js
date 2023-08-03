@@ -33,13 +33,14 @@ const orderSchema = new mongoose.Schema(
                required: true
             },
             
-               receivedDate:{
-                  type:Date,
-               }
+             
             
          }
       ],
-
+      receivedDate:{
+         type:String,
+         default:""
+      },
       pay: {
          type: Boolean,
          default: false
