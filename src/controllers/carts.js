@@ -94,7 +94,7 @@ export const removeOneProductInCart = async (req, res) => {
         let cart = await Cart.findOne({ userId: userId })
 
         //tìm idProduct để sánh
-        const productExits = await cart.products.find(item => item.productId == req.params.id)
+        const productExits = cart.products.find(item => item.productId == req.params.id)
         console.log("product: ", productExits);
         const product = await Products.findById(productExits.productId)
         console.log(product.price);
