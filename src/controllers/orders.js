@@ -3,9 +3,9 @@ import Cart from "../models/carts";
 //Tạo mới đơn hàng
 export const createOrder = async (req, res) => {
   try {
-    const { cartId, address, userId, phone, note, customerName } = req.body;
+    const { cartId, address, userId, phone, note, customerName , receivedDate} = req.body;
     const cart = await Cart.findById(cartId).populate("products.productId");
-
+    
     const products = cart.products.map((item) => {
       const { productId, quantity } = item;
 
@@ -24,7 +24,8 @@ export const createOrder = async (req, res) => {
       note: note,
       products: products,
       totalPrice: cart.totalPrice,
-      customerName: customerName
+      customerName: customerName,
+      receivedDate
     });
     await cart.deleteOne({ _id: cart._id })
     await order.populate("products.productId")
@@ -61,7 +62,7 @@ export const getAdminOrders = async (req, res) => {
   try {
     const order = await Order.find()
     return res.status(201).json({
-      message: "Get orders successfully",
+      message: "AD Get orders successfully",
       order
     })
   } catch (error) {
@@ -85,7 +86,7 @@ export const getOrderDetail = async (req, res) => {
     const { canCancel, remainingTime } = checkCancellationTime(order);
     let remainingTimeMessage = null
     let formattedTime = Number(remainingTime.toFixed(2))
-    if (canCancel) {
+    if (formattedTime>0) {
 
       remainingTimeMessage = "Còn lại: " + formattedTime + "h để hủy đơn hàng này";
 
@@ -116,6 +117,7 @@ export const getOrderDetail = async (req, res) => {
 // status: (chưa xử lý, chờ xác nhận => KH có thể hủy),đang giao, đã nhận hàng,đã hủy
 export const updateOrder = async (req, res) => {
   try {
+    console.log(req.body);
     const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!order) {
       return res.status(401).json({
