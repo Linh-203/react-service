@@ -1,26 +1,83 @@
-import User from "../models/users"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
+import User from '../models/users';
+import jwt from 'jsonwebtoken';
+import { setCookie } from '../tools/createCookie';
+const createToken = (_id) => {
+   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '1d' });
+};
+export const getToken = (req, res) => {
+   try {
+      const token = req.cookies.jwt;
+      if (!token) {
+         return res.json({
+            token: ''
+         });
+      }
+      return res.json({
+         token: token
+      });
+   } catch (error) {
+      return res.status(400).json({
+         message: error,
+         status: 'not success'
+      });
+   }
+};
+export const clearToken = (req, res) => {
+   try {
+      const token = req.cookies?.jwt;
+      if (!token) {
+         return res.json({
+            message: 'not have cookie token',
+            status: 'success'
+         });
+      }
+      res.clearCookie('jwt');
+      return res.json({
+         message: 'cleared cookie',
+         status: 'success'
+      });
+   } catch (error) {
+      return res.status(400).json({
+         message: error,
+         status: 'not success'
+      });
+   }
+};
+//signup
+const signupUser = async (req, res) => {
+   const { name, email, password, phone } = req.body;
+   try {
+      const user = await User.signup(name, email, password, phone);
+      // create token
+      const token = createToken(user._id);
+      const { cookieName, cookieValue, expire } = setCookie('jwt', token, 1);
+      res.cookie(cookieName, cookieValue, { expire, httpOnly: true });
+      user.password = undefined;
+      res.status(200).json({ user, token });
+   } catch (error) {
+      res.status(400).json({ error: error.message });
+   }
+};
 
-export const register = async (req, res) => {
-    try {
-        const { email, password } = req.body
-        const emailExists = await User.findOne({ email: email })
-        if (emailExists) {
-            return res.status(401).json({
-                message: "Email đã được đăng ký"
-            })
-        }
-        const hashPassword = await bcrypt.hash(password, 10)
-        const user = await User.create({ ...req.body, password: hashPassword })
+//login
+const loginUser = async (req, res) => {
+   const { email, password } = req.body;
+   try {
+      const user = await User.login(email, password);
+      // create token
+      const token = createToken(user._id);
+      const { cookieName, cookieValue, expire } = setCookie('jwt', token, 1);
+      res.cookie(cookieName, cookieValue, { expire, httpOnly: true });
+      user.password = undefined;
+      res.status(200).json({ user, token });
+   } catch (error) {
+      res.status(400).json({ error: error.message });
+   }
+};
 
-        return res.status(201).json({
-            message: "Register account successfully",
-            user
-        })
-    } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        })
-    }
-}
+export const users = {
+   signupUser,
+   loginUser,
+   getToken,
+   clearToken
+};
