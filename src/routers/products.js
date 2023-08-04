@@ -1,14 +1,13 @@
 import { product } from '../controllers/products';
 import express from 'express';
-//import checkPermission from '../middlewares/checkPermission';
+import checkPermission from '../middlewares/authorization';
+import authentication from '../middlewares/authenticateToken';
+const router = express.Router();
 
-const router = express.Router()
+router.get('/products', product.getAllProducts);
+router.get('/products/:id', product.getDetailProducts);
+router.delete('/products/:id', authentication, checkPermission, product.removeProducts);
+router.patch('/products/:id', authentication, checkPermission, product.patchProducts);
+router.post('/products', authentication, checkPermission, product.createProducts);
 
-router.get('/products', product.getAllProducts)
-router.get('/products/:id', product.getDetailProducts)
-router.delete('/products/:id', product.removeProducts)
-router.patch('/products/:id', product.patchProducts)
-router.post('/products', product.createProducts)
-//router.post('/products/restore/:id', checkPermission, product.restorePrd)
-
-export default router
+export default router;
