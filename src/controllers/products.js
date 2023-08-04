@@ -87,7 +87,7 @@ const getDetailProducts = async (req, res) => {
    try {
       const product = await Product.findOne({ _id: req.params.id }).populate([
          { path: 'categoryId', select: ['_id', 'name', 'image'] },
-         { path: 'variations.vendorId', select: ['name'] }
+         { path: 'variations.vendorId', select: ['name', 'origin'] }
       ]);
       if (product.length === 0) {
          res.json({
