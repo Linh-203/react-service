@@ -13,8 +13,8 @@ const cartSchema = new mongoose.Schema({
             ref: "Products"
         },
         variationId:{
-            type:String,
-            
+            type: String,
+            required: true,
         },
         quantity: {
             type: Number,
