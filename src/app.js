@@ -6,11 +6,11 @@ import authRouter from './routers/auth';
 import cartRouter from './routers/carts';
 import orderRouter from './routers/orders';
 import uploadRouter from './routers/upload';
-import userRouter from './routers/auth';
+import userRouter from './routers/users';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
+import vendorRoute from './routers/vendor';
 const app = express();
 dotenv.config();
 app.use(cors({ origin: true, credentials: true }));
