@@ -30,3 +30,27 @@ export const createVendor = async (req, res) => {
       });
    }
 };
+
+export const getAllVendor = async (req, res) => {
+   try {
+      const vendors = await vendorModel.find();
+      if (!vendors)
+         return res.status(400).json({
+            message: 'Cannot get vendors'
+         });
+      if (vendors.length === 0)
+         return res.status(200).json({
+            message: 'Not found any vendors',
+            data: []
+         });
+      return res.status(200).json({
+         message: 'Get all vendor success!',
+         data: vendors
+      });
+   } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+         message: 'Error'
+      });
+   }
+};

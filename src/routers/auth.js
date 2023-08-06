@@ -5,4 +5,6 @@ const router = express.Router();
 router.post('/signup', users.signupUser);
 //login router
 router.post('/login', users.loginUser);
+router.get('/token', users.getToken);
+router.delete('/token', users.clearToken);
 export default router;
