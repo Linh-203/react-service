@@ -27,7 +27,7 @@ app.use('/api', uploadRouter);
 app.use('/api', userRouter);
 app.use('/api', vendorRoute);
 mongoose
-   .connect('mongodb://127.0.0.1:27017/vegetables')
+   .connect('mongodb+srv://linhvh203:Linhdz112003@freshmart.ys6kmcb.mongodb.net/vegetables')
    .then(() => console.log('connect success'))
    .catch((err) => console.log(err));
 app.listen(process.env.PORT, () => {
