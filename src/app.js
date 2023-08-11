@@ -27,7 +27,10 @@ app.use('/api', uploadRouter);
 app.use('/api', userRouter);
 app.use('/api', vendorRoute);
 mongoose
-   .connect("mongodb://127.0.0.1:27017/vegetables")
+   .connect('mongodb://127.0.0.1:27017/vegetables')
    .then(() => console.log('connect success'))
    .catch((err) => console.log(err));
-export const viteNodeApp = app;
+app.listen(process.env.PORT, () => {
+   console.log(`listening on ${process.env.PORT}`);
+});
+// export const viteNodeApp = app;
