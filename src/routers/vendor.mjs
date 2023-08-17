@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createVendor, getAllVendor } from '../controllers/vendor';
+import { createVendor, getAllVendor } from '../controllers/vendor.mjs';
 const vendorRoute = Router();
 
 vendorRoute.post('/vendor', createVendor);

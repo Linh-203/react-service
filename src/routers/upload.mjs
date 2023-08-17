@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
-import cloudinary from '../config/cloudinary.js';
-import { deleteImage, uploadImage } from '../controllers/upload.js';
+import cloudinary from '../config/cloudinary.mjs';
+import { deleteImage, uploadImage } from '../controllers/upload.mjs';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 const router = Router();

@@ -1,5 +1,5 @@
-import Cart from '../models/carts';
-import Products from '../models/products';
+import Cart from '../models/carts.mjs';
+import Products from '../models/products.mjs';
 // add cart
 export const addToCart = async (req, res) => {
    try {
@@ -50,7 +50,7 @@ export const updateCart = async (req, res) => {
       //tìm trong giỏ hàng theo idUser
       let cart = await Cart.findOne({ userId: userId });
       //tìm idProduct để sánh
-      const productExits =  cart.products.find((item) => item.productId == productId);
+      const productExits = cart.products.find((item) => item.productId == productId);
       const product = await Products.findById(productId);
       const variationInfo = product.variations.find((item) => item._id === variationId);
       const price = product.price;

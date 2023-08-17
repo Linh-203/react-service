@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/users';
-const checkPermission = async (req, res, next) => {
+import User from '../models/users.mjs';
+const authorization = async (req, res, next) => {
    try {
       const token = req.headers.authorization.split(' ')[1];
       jwt.verify(token, process.env.SECRET, async (err, payload) => {
@@ -18,4 +18,4 @@ const checkPermission = async (req, res, next) => {
       res.status(401).json({ message: error.message });
    }
 };
-export default checkPermission;
+export default authorization;

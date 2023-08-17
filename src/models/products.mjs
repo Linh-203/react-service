@@ -41,23 +41,9 @@ const productSchema = new mongoose.Schema(
       },
       variations: [
          {
-            _id: {
-               type: String,
-               required: true
-            },
-            weight: {
-               type: Number,
-               required: true
-            },
-            vendorId: {
-               type: mongoose.Schema.Types.ObjectId,
-               ref: 'vendor',
-               required: true
-            },
-            quantity: {
-               type: Number,
-               required: true
-            }
+            type: mongoose.Types.ObjectId,
+            required: true,
+            ref: 'variation'
          }
       ]
    },

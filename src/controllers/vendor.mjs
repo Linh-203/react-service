@@ -1,5 +1,5 @@
-import vendorModel from '../models/vendor';
-import { vendorSchema } from '../validation/vendor';
+import vendorModel from '../models/vendor.mjs';
+import { vendorSchema } from '../validation/vendor.mjs';
 
 export const createVendor = async (req, res) => {
    const { error } = vendorSchema.validate(req.body, { abortEarly: false });

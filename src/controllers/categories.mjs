@@ -1,6 +1,6 @@
-import Category from '../models/categories';
+import Category from '../models/categories.mjs';
 import Joi from 'joi';
-import Product from '../models/products';
+import Product from '../models/products.mjs';
 
 const categorySchema = Joi.object({
    name: Joi.string().required().min(3),
@@ -27,7 +27,6 @@ const getAllCategories = async (req, res) => {
 };
 
 const getDetailCategory = async (req, res) => {
-  
    try {
       const category = await Category.findOne({ _id: req.params.id });
       if (category.length === 0) {
@@ -35,18 +34,16 @@ const getDetailCategory = async (req, res) => {
             message: 'No category found'
          });
       }
-     
+
       if (!category) {
          return res.status(404).json({
             message: 'No products found in this category'
          });
       }
-         return res.status(200).json({
-         message :"Get categories successfully",
+      return res.status(200).json({
+         message: 'Get categories successfully',
          category
-            
-         })
-      
+      });
    } catch (err) {
       res.status(500).send({ message: err.message });
    }
@@ -55,16 +52,17 @@ const getDetailCategory = async (req, res) => {
 const removeCategories = async (req, res) => {
    try {
       const category = await Category.findOne({ _id: req.params.id });
-      const defaultCategoryId = "64b646e60c3ef0986d3b1b33"; //id Danh mục mặc định
+      const defaultCategoryId = '64b646e60c3ef0986d3b1b33'; //id Danh mục mặc định
 
-      await Product.updateMany(
-         { category: category._id },
-         { $set: { category: defaultCategoryId } }
+      await Product.updateMany({ category: category._id }, { $set: { category: defaultCategoryId } });
+
+      const defaultCate = await Category.findByIdAndUpdate(
+         defaultCategoryId,
+         {
+            $push: { products: category.products }
+         },
+         { new: true }
       );
-
-      const defaultCate = await Category.findByIdAndUpdate(defaultCategoryId, {
-         $push: { products: category.products }
-      },{new:true});
 
       await Category.findOneAndDelete({ _id: req.params.id });
       res.json({
@@ -75,7 +73,6 @@ const removeCategories = async (req, res) => {
       res.status(500).send({ message: err.message });
    }
 };
-
 
 const patchCategories = async (req, res) => {
    try {

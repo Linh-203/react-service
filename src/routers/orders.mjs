@@ -1,5 +1,5 @@
 import express from "express";
-import { cancelOrder, createOrder, filterOrders, getAdminOrders, getOrderDetail, getUserOrders, resetOrder, updateOrder } from "../controllers/orders";
+import { cancelOrder, createOrder, filterOrders, getAdminOrders, getOrderDetail, getUserOrders, resetOrder, updateOrder } from "../controllers/orders.mjs";
 
 const router = express.Router()
 

@@ -1,7 +1,7 @@
-import Category from '../models/categories';
-import Product from '../models/products';
-import vendorModel from '../models/vendor';
-import { productSchema } from '../validation/products';
+import Category from '../models/categories.mjs';
+import Product from '../models/products.mjs';
+import Variation from '../models/variations.mjs';
+import { productSchema } from '../validation/products.mjs';
 
 const getAllProducts = async (req, res) => {
    try {
@@ -86,9 +86,12 @@ const getAllProducts = async (req, res) => {
 const getDetailProducts = async (req, res) => {
    try {
       const product = await Product.findOne({ _id: req.params.id }).populate([
-         { path: 'categoryId', select: ['_id', 'name', 'image'] },
-         { path: 'variations.vendorId', select: ['name', 'origin'] }
+         { path: 'categoryId', select: ['_id', 'name', 'image'] }
       ]);
+      const variations = await Variation.find({ productId: req.params.id }).populate([
+         { path: 'vendorId', select: ['name', 'origin'] }
+      ]);
+      const returnData = { ...product.toObject(), variations: variations ? variations : [] };
       if (product.length === 0) {
          res.json({
             message: 'No product found'
@@ -96,7 +99,7 @@ const getDetailProducts = async (req, res) => {
       } else {
          res.json({
             message: 'Get product successfully',
-            data: product
+            data: returnData
          });
       }
    } catch (err) {
