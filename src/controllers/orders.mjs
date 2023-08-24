@@ -5,7 +5,7 @@ export const createOrder = async (req, res) => {
    try {
       const { cartId, address, userId, phone, note, customerName, receivedDate } = req.body;
       const cart = await Cart.findById(cartId).populate('products.productId');
-
+          console.log(cart);
       const products = cart.products.map((item) => {
          const { productId, quantity } = item;
 
@@ -27,7 +27,7 @@ export const createOrder = async (req, res) => {
          customerName: customerName,
          receivedDate
       });
-      await cart.deleteOne({ _id: cart._id });
+      await Cart.findByIdAndUpdate({ _id: cart._id }, { products: [] });
       await order.populate('products.productId');
 
       order.save();
@@ -45,8 +45,7 @@ export const createOrder = async (req, res) => {
 export const getUserOrders = async (req, res) => {
    try {
       const userId = req.params.id;
-      console.log(userId);
-      const order = await Order.find({ userId: userId });
+      const order = await Order.find({ userId: userId }).sort({ createdAt: 1 });
       return res.status(201).json({
          message: 'Get orders successfully',
          order
@@ -111,7 +110,6 @@ export const getOrderDetail = async (req, res) => {
 // status: (chưa xử lý, chờ xác nhận => KH có thể hủy),đang giao, đã nhận hàng,đã hủy
 export const updateOrder = async (req, res) => {
    try {
-      console.log(req.body);
       const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
       if (!order) {
          return res.status(401).json({
@@ -194,7 +192,6 @@ export const resetOrder = async (req, res) => {
 export const filterOrders = async (req, res) => {
    try {
       let order = await Order.find({ userId: req.params.idUser, status: req.body.status });
-      console.log(req.params.idUser, req.body.status);
       if (req.body.status == '') {
          order = await Order.find({ userId: req.params.idUser });
       }

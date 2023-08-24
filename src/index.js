@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import { createServer } from 'http';
 import productRouter from './routers/products.mjs';
 import categoryRouter from './routers/categories.mjs';
 import authRouter from './routers/auth.mjs';
@@ -12,9 +13,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import vendorRoute from './routers/vendor.mjs';
 import variationRouter from './routers/variation.mjs';
+import { Server } from 'socket.io';
+dotenv.config();
 
 const app = express();
-dotenv.config();
+const httpServer = createServer(app);
+const socketServer = new Server(httpServer, {
+   cors: '*'
+});
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
@@ -33,4 +39,18 @@ mongoose
    .then(() => console.log('connect success'))
    .catch((err) => console.log(err));
 
-app.listen(process.env.PORT)
+socketServer.on('connection', (socket) => {
+   console.log('connect socket');
+});
+socketServer.of('/admin').on('connection', (socket) => {
+   socket.on('newOrder', ({ data }) => {
+      const returnData = {
+         eventId: socket.id,
+         notice: `New Order by ${data.user.name} has placed!`,
+         order: data.order
+      };
+      socketServer.of('/admin').emit('orderConfirm', { data: returnData });
+   });
+});
+
+httpServer.listen(8000);
