@@ -1,5 +1,6 @@
-import Cart from '../models/carts';
-import Products from '../models/products';
+import Cart from '../models/carts.mjs';
+import Products from '../models/products.mjs';
+import { setCookie } from '../tools/createCookie.mjs';
 // add cart
 export const addToCart = async (req, res) => {
    try {
@@ -15,13 +16,11 @@ export const addToCart = async (req, res) => {
       const productIndex = cart.products.find((item) => item.productId == productId);
       const product = await Products.findById(productId);
       const price = product.price;
-      const variationInfo = product.variations.find((item) => item._id === variationId);
       if (!productIndex) {
          cart.products.push({
             productId: productId,
             price: price,
-            quantity: quantity,
-            variationId: variationId
+            quantity: quantity
          });
 
          //C2: dùng $push để thêm ptu vào mảng trong mongoDB
@@ -35,7 +34,7 @@ export const addToCart = async (req, res) => {
 
       return res.status(201).json({
          message: 'Create cart successfully',
-         cart: { ...cart.pathsToScopes, variationInfo: variationInfo }
+         cart: { ...cart.pathsToScopes }
       });
    } catch (error) {
       return res.status(400).json({
@@ -50,9 +49,8 @@ export const updateCart = async (req, res) => {
       //tìm trong giỏ hàng theo idUser
       let cart = await Cart.findOne({ userId: userId });
       //tìm idProduct để sánh
-      const productExits =  cart.products.find((item) => item.productId == productId);
+      const productExits = cart.products.find((item) => item.productId == productId);
       const product = await Products.findById(productId);
-      const variationInfo = product.variations.find((item) => item._id === variationId);
       const price = product.price;
       if (productExits.quantity > quantity) {
          cart.totalPrice = cart.totalPrice - price * (productExits.quantity - quantity);
@@ -67,7 +65,7 @@ export const updateCart = async (req, res) => {
 
       return res.status(201).json({
          message: 'Update cart successfully',
-         cart: { ...cart.pathsToScopes, variationInfo: variationInfo }
+         cart: { ...cart.pathsToScopes }
       });
    } catch (error) {
       return res.status(400).json({
@@ -146,6 +144,8 @@ export const getCartUser = async (req, res) => {
          });
       }
       await cart.populate('products.productId');
+      const { cookieName, cookieValue, expire } = setCookie('demo', 'ahyhy', 1);
+      res.cookie(cookieName, cookieValue, { expire: expire, httpOnly: true });
       return res.status(201).json({
          message: 'Get cart successfully',
          cart

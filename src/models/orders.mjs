@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const orderSchema = new mongoose.Schema(
    {
@@ -31,15 +32,12 @@ const orderSchema = new mongoose.Schema(
             price: {
                type: Number,
                required: true
-            },
-            
-             
-            
+            }
          }
       ],
-      receivedDate:{
-         type:String,
-         default:""
+      receivedDate: {
+         type: String,
+         default: ''
       },
       pay: {
          type: Boolean,
@@ -66,5 +64,5 @@ const orderSchema = new mongoose.Schema(
    },
    { timestamps: true, versionKey: false }
 );
-
+orderSchema.plugin(mongoosePaginate);
 export default mongoose.model('Order', orderSchema);

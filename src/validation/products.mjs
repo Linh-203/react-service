@@ -12,14 +12,5 @@ export const productSchema = Joi.object({
    discount: Joi.number().min(0),
    desc: Joi.string().required(),
    categoryId: Joi.string().required(),
-   variations: Joi.array()
-      .items(
-         Joi.object({
-            _id: Joi.string().required(),
-            weight: Joi.number().required(),
-            vendorId: Joi.string().required(),
-            quantity: Joi.number().required()
-         }).required()
-      )
-      .required()
+   variations: Joi.array().items(Joi.string().required()).required()
 });

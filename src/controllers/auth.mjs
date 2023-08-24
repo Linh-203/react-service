@@ -1,6 +1,9 @@
-import User from '../models/users';
+import User from '../models/users.mjs';
 import jwt from 'jsonwebtoken';
-import { setCookie } from '../tools/createCookie';
+import { setCookie } from '../tools/createCookie.mjs';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const createToken = (_id) => {
    return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '1d' });
 };
